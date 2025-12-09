@@ -549,9 +549,9 @@
             <div class="col-lg-7 offset-lg-2">
               <div class="contact-form">
                 <h3>Get In Touch</h3>
-                <p>Hubungi saya.</p>
+                <p></p>
 
-                  <form action="https://formspree.io/f/xldqwaww" method="POST" class="php-email-form">
+                  <form action="#" method="POST" class="php-email-form">
                     <div class="row gy-4">
                     <div class="col-md-6">
                       <input type="text" name="name" class="form-control" placeholder="Your Name" required="" />
@@ -617,7 +617,76 @@
     <script src="assets/vendor/imagesloaded/imagesloaded.pkgd.min.js"></script>
     <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
     <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+    <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 1. Ambil elemen-elemen formulir
+            const form = document.querySelector('.php-email-form');
+            if (!form) return; // Hentikan jika formulir tidak ditemukan
+
+            const submitButton = form.querySelector('button[type="submit"]');
+            const sentMessage = form.querySelector('.sent-message');
+            const errorMessage = form.querySelector('.error-message');
+            const loadingDiv = form.querySelector('.loading');
+
+            // 2. Tentukan Endpoint Formspree (WAJIB diganti dengan URL Anda)
+            const formspreeUrl = 'https://formspree.io/f/xldqwaww'; 
+
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault(); // <-- KUNCI: Mencegah redirect browser standar
+
+                // Sembunyikan pesan lama & Tampilkan loading
+                loadingDiv.style.display = 'block';
+                sentMessage.style.display = 'none';
+                errorMessage.style.display = 'none';
+                submitButton.disabled = true;
+
+                // Kumpulkan data formulir
+                const formData = new FormData(form);
+
+                try {
+                    const response = await fetch(formspreeUrl, {
+                        method: 'POST',
+                        body: formData,
+                        // Header ini penting agar Formspree merespons dengan JSON, bukan redirect
+                        headers: {
+                            'Accept': 'application/json' 
+                        }
+                    });
+
+                    loadingDiv.style.display = 'none'; // Sembunyikan loading
+
+                    if (response.ok) {
+                        // 3. Sukses: Tampilkan pesan sukses dan kosongkan formulir
+                        sentMessage.style.display = 'block';
+                        form.reset(); 
+                        
+                        // Sembunyikan pesan sukses setelah 5 detik
+                        setTimeout(() => {
+                            sentMessage.style.display = 'none';
+                        }, 5000); 
+
+                    } else {
+                        // 4. Gagal: Tampilkan pesan error
+                        errorMessage.textContent = 'Oops! Gagal mengirim pesan. Silakan coba lagi.';
+                        errorMessage.style.display = 'block';
+                        // Opsional: Log error spesifik jika Formspree mengirimkannya
+                        // const data = await response.json();
+                        // if (data && data.errors) console.error(data.errors);
+                    }
+                } catch (error) {
+                    // Gagal total (masalah koneksi)
+                    loadingDiv.style.display = 'none';
+                    errorMessage.textContent = 'Terjadi kesalahan jaringan.';
+                    errorMessage.style.display = 'block';
+                } finally {
+                    submitButton.disabled = false; // Aktifkan kembali tombol
+                }
+            });
+        });
+    </script>
+    
     <!-- Main JS File -->
     <script src="assets/js/main.js"></script>
   </body>
